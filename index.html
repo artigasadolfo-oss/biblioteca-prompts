@@ -326,11 +326,13 @@ function cardEl(c){
   row.appendChild(star);row.appendChild(trash);row.appendChild(copy);
   d.appendChild(h);d.appendChild(p);d.appendChild(row);return d;
 }
-function editText(el,c,key){el.contentEditable=true;el.draggable=false;el.focus();
-  const done=()=>{el.contentEditable=false;c[key]=(el.textContent||"").trim();save();renderCards();};
+function editText(el,c,key,onDone){el.contentEditable=true;el.draggable=false;el.focus();
+  const done=()=>{el.contentEditable=false;c[key]=(el.textContent||"").trim();save();renderCards();if(onDone)onDone();};
   el.onblur=done;el.onkeydown=e=>{if(e.key==="Enter"&&key==="title"){e.preventDefault();el.blur();}if(e.key==="Escape"){el.blur();}};}
 function newCard(){const fid=S.selection.folderId||"root";const n=S.cards.filter(x=>x.folderId===fid).length;const c={id:uid(),folderId:fid,title:"Nueva ficha",desc:"",favorite:false,order:n};S.cards.push(c);save();renderCards();
-  setTimeout(()=>{const own=$("grid").querySelector('.card[data-id="'+c.id+'"] h3');if(own)editText(own,c,"title");},30);}
+  setTimeout(()=>{const ownTitle=$("grid").querySelector('.card[data-id="'+c.id+'"] h3');if(ownTitle)editText(ownTitle,c,"title",()=>{
+    setTimeout(()=>{const ownDesc=$("grid").querySelector('.card[data-id="'+c.id+'"] p');if(ownDesc)editText(ownDesc,c,"desc");},30);
+  });},30);}
 /* ---- Paleta ---- */
 const palette=$("palette");
 function openPalette(x,y,pick){palette.innerHTML="";PAL.forEach(col=>{const s=document.createElement("div");s.className="sw";s.style.background=col;s.onclick=()=>{palette.style.display="none";pick(col);};palette.appendChild(s);});palette.style.left=(x+6)+"px";palette.style.top=(y+6)+"px";palette.style.display="flex";
